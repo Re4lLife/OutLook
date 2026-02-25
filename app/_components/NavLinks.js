@@ -14,7 +14,7 @@ export default function NavLinks() {
   const underlineStyles = "absolute -bottom-2 left-[-10%] w-[120%] h-[2px] bg-gradient-to-r from-purple-500 to-blue-500 rounded-full";
 
   return (
-    <nav className="mt-[20vh] items-center flex gap-[15vw] justify-center">
+    <nav className="mt-[15vh] items-center flex gap-[15vw] justify-center">
       <Link href="/get-started/sign-in" className={`${linkStyles} ${isActive('/get-started/sign-in') ? activeColor : inactiveColor}`}>
         Sign in
         {isActive('/get-started/sign-in') && <div className={underlineStyles} />}
