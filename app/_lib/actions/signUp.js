@@ -2,6 +2,8 @@
 import { redirect } from "next/navigation";
 import prisma from "../../_lib/prisma";
 import bcrypt from "bcrypt";
+import { v4 as uuidv4 } from "uuid";
+import { sendVerificationEmail } from "../mail";
 
 export async function signUp(prevState, formData) {
     const username = formData.get("username");
@@ -37,13 +39,16 @@ export async function signUp(prevState, formData) {
             },
         });
 
+        const verificationToken = uuidv4();
+        await sendVerificationEmail(email, verificationToken);
+
         isSuccess = true;
+        if(isSuccess) return { success: "A confirmation email has been sent to your inbox 📩" }
+        
+
     } catch (error) {
         console.error("Signup Error:", error);
         return { error: "Internal server error. Please try again." };
     }
 
-    if (isSuccess) {
-        redirect("/get-started/sign-in?message=account_created")
-    }
 }

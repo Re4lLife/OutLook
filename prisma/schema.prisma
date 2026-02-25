@@ -21,7 +21,7 @@ model User {
   password      String
   memberships   ConversationMember[]
   messages      Message[]
-  emailVerified DateTime?            @default(now())
+  emailVerified DateTime?            
   createdAt     DateTime             @default(now())
   updatedAt     DateTime             @updatedAt
 
