@@ -70,11 +70,11 @@ export default function SignUpPage() {
                         </div>
                     </div>
 
-                    <button disabled={pending} className="w-full bg-linear-to-r from-purple-500 to-blue-900 hover:from-purple-900 hover:to-blue-500 text-white font-semibold py-3 rounded-lg shadow-lg transform transition active:scale-[0.98] mt-4">
-                        {pending ? "Submitting..." : "Sign Up"}
+                    <button disabled={pending} className="w-full bg-linear-to-r from-purple-500 to-blue-900 hover:from-purple-900  text-white font-semibold py-3 rounded-lg shadow-lg transform transition active:scale-[0.98] mt-4">
+                        {pending ? "SUBMITTING..." : "SIGN UP"}
                     </button>
                 </div>
             </form>
         </div>
     );
-}
+} 

@@ -1,5 +1,4 @@
 "use server";
-import { redirect } from "next/navigation";
 import prisma from "../../_lib/prisma";
 import bcrypt from "bcrypt";
 import { v4 as uuidv4 } from "uuid";
@@ -19,13 +18,21 @@ export async function signUp(prevState, formData) {
         return { error: "Password must be at least 5 characters and contain both letters and numbers." };
     }
 
-    let isSuccess = false;
-
     try {
-        const existingEmail = await prisma.user.findFirst({ where: { email } });
-        if (existingEmail) return { error: "This user already exists." };
+        const existingUser = await prisma.user.findUnique({ where: { email } });
 
-        const existingUsername = await prisma.user.findFirst({ where: { username } });
+        if (existingUser) {
+            if (existingUser.emailVerified) {
+                return { error: "This user already exists." };
+            }
+
+            const verificationToken = uuidv4();
+            await sendVerificationEmail(email, verificationToken);
+            
+            return { success: "You already have an unverified account. We've sent a fresh verification link to your inbox! 📩" };
+        }
+
+        const existingUsername = await prisma.user.findUnique({ where: { username } });
         if (existingUsername) return { error: "This username has already been taken." };
 
         const hashedPassword = await bcrypt.hash(password, 10);
@@ -42,13 +49,10 @@ export async function signUp(prevState, formData) {
         const verificationToken = uuidv4();
         await sendVerificationEmail(email, verificationToken);
 
-        isSuccess = true;
-        if(isSuccess) return { success: "A confirmation email has been sent to your inbox 📩" }
-        
+        return { success: "A confirmation email has been sent to your inbox 📩" };
 
     } catch (error) {
         console.error("Signup Error:", error);
         return { error: "Internal server error. Please try again." };
     }
-
 }
