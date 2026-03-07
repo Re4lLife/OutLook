@@ -1,11 +1,12 @@
 "use client";
 
-import { useActionState, useState, useTransition } from 'react';
+import { useActionState, useEffect, useState, useTransition } from 'react';
 import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 import { signIn } from '../../_lib/actions/signIn';
 import { resendVerification } from '../../_lib/actions/resendEmail';
 import { useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 
 export default function SignInPage() {
     const searchParams = useSearchParams();
@@ -16,6 +17,18 @@ export default function SignInPage() {
     const [isPending, startTransition] = useTransition();
     const [resendMessage, setResendMessage] = useState("");
     const [isSuccess, setIsSuccess] = useState(false);
+    const router = useRouter();
+
+    useEffect(() => {
+        if (state?.token) {
+            localStorage.setItem("outlook_token", state.token);
+            
+            setTimeout(() => {
+                router.push("/chat");
+            }, 1500); 
+        }
+    }, [state?.token, router]);
+
 
     const handleResend = (email) => {
         startTransition(async () => {
