@@ -1,19 +1,62 @@
 "use client"
+import { createClient } from '../../_lib/supabase/client';
 import { useEffect, useOptimistic, useRef, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { sendMessage } from '../../_lib/actions/sendMessage';
+
+const supabase = createClient();
+
 
 export default function ChatInterface({ initialData, userId, chatId }) {
     const [chat, setChat] = useState(initialData);
     const [text, setText] = useState("");
     const scrollRef = useRef(null);
 
+    useEffect(() => {
+        // 1. Create a channel for this specific conversation
+        const channel = supabase
+            .channel(`realtime:chat:${chatId}`)
+            .on(
+                'postgres_changes',
+                {
+                    event: 'INSERT',
+                    schema: 'public',
+                    table: 'message',
+                    filter: `conversationId=eq.${chatId}`, // Only listen to THIS chat
+                },
+                (payload) => {
+                    const newMessage = payload.new;
+
+                    if (newMessage.userId !== userId) {
+                        setChat((prev) => ({
+                            ...prev,
+                            messages: [...prev.messages, {
+                                id: newMessage.id,
+                                content: newMessage.content,
+                                createdAt: newMessage.createdAt,
+                                isMe: false
+                            }]
+                        }));
+                    }
+                }
+            )
+            .subscribe();
+
+        // 3. CLEANUP: Leave the room when the user switches chats
+        return () => {
+            supabase.removeChannel(channel);
+        };
+    }, [chatId, userId]);
+
+
+    //......................................
     const [optimisticMessages, addOptimisticMessage] = useOptimistic(
         chat.messages,
         (state, newMessage) => [...state, newMessage]
     );
 
+    //......................................
     useEffect(() => {
         if (scrollRef.current) {
             scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
@@ -21,16 +64,16 @@ export default function ChatInterface({ initialData, userId, chatId }) {
     }, [optimisticMessages]);
 
 
+    //........................................
     useEffect(() => {
         setChat(initialData);
     }, [initialData]);
 
 
+    //........................................
     async function handleAction(formData) {
         const content = formData.get("message");
         if (!content || !content.trim()) return;
-
-        setText("");
 
         const placeholderMsg = {
             id: Math.random().toString(), // temporary ID
@@ -93,7 +136,10 @@ export default function ChatInterface({ initialData, userId, chatId }) {
 
             {/* INPUT AREA */}
             <div className="w-full border-t border-zinc-800 p-4 bg-[#050505]">
-                <form action={handleAction} className="max-w-4xl mx-auto flex items-center gap-3">
+                <form 
+                action={handleAction} 
+                onSubmit={() => setText("")}
+                className="max-w-4xl mx-auto flex items-center gap-3">
                     <input
                         name="message"
                         value={text}
