@@ -7,15 +7,16 @@ const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
     const [user, setUser] = useState(null);
+    const [token, setToken] = useState(null); 
     const [isLoading, setIsLoading] = useState(true);
     const router = useRouter();
     const pathname = usePathname();
 
     useEffect(() => {
         const verifyUser = async () => {
-            const token = localStorage.getItem("outlook_token");
+            const storedToken = localStorage.getItem("outlook_token");
 
-            if (!token) {
+            if (!storedToken) {
                 setIsLoading(false);
                 if (pathname.startsWith('/chat')) {
                     router.push('/get-started/sign-in');
@@ -27,16 +28,21 @@ export function AuthProvider({ children }) {
                 const res = await fetch('/api/auth/me', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ token })
+                    body: JSON.stringify({ token: storedToken })
                 });
 
                 if (!res.ok) throw new Error("Verification failed");
 
                 const data = await res.json();
                 setUser(data.user);
+                setToken(storedToken);
+
+                document.cookie = `outlook_token=${storedToken}; path=/; SameSite=Strict; Secure`;
+
             } catch (error) {
                 console.error("Auth error:", error.message);
                 localStorage.removeItem("outlook_token");
+                document.cookie = `outlook_token=; path=/; max-age=0`;
                 router.push('/get-started/sign-in');
             } finally {
                 setIsLoading(false);
@@ -47,7 +53,7 @@ export function AuthProvider({ children }) {
     }, [router, pathname]);
 
     return (
-        <AuthContext.Provider value={{ user, isLoading }}>
+        <AuthContext.Provider value={{ user, token, isLoading }}>
             {children}
         </AuthContext.Provider>
     );

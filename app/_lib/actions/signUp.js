@@ -4,12 +4,14 @@ import bcrypt from "bcrypt";
 import { v4 as uuidv4 } from "uuid";
 import { sendVerificationEmail } from "../mail";
 import { emailLimiter, ipLimiter } from "../ratelimiter";
+import { headers } from "next/headers";
 
 export async function signUp(prevState, formData) {
     const username = formData.get("username");
     const email = formData.get("email")?.toLowerCase();
     const password = formData.get("password");
-    const ip = (await headerList).get("True-Client-IP");
+    const headerList = await headers()
+    const ip = headerList.get("True-Client-IP");
 
     if (!username || !email || !password) {
         return { error: "All fields are required." };

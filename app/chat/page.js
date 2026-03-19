@@ -1,23 +1,15 @@
-import useAuth from '../context/AuthContext';
 
-function ChatPage() {
-  const { user, isLoading } = useAuth();
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-[#0d012e] flex items-center justify-center">
-        <div className="text-purple-500 animate-pulse text-xs uppercase tracking-widest">
-          Verifying Identity...
-        </div>
-      </div>
-    );
-  }
-
-  if (!user) return null;
-
+export default function NoChatSelected() {
   return (
-    <div>layout component</div>
+    <div className="flex h-full w-2xl mx-auto flex-col items-center justify-center bg-[#050505] text-zinc-500">
+      <div className="w-20 h-20 rounded-full bg-zinc-900/80 flex items-center justify-center border border-zinc-800">
+         <span className="text-3xl">✉️</span>
+      </div>
+      
+      <p className="text-center text-sm">
+        Start a conversation with a friend.
+      </p>
+    </div>
   );
-};
+}
 
-export default ChatPage;
