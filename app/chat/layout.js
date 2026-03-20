@@ -1,6 +1,6 @@
 "use client"
 import { usePathname } from "next/navigation";
-import ChatList from "../_components/ChatList";
+import ChatList from "./ChatList";
 
 function ChatLayout({ children }) {
   const pathname = usePathname();

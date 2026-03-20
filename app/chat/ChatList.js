@@ -5,7 +5,7 @@ import { getMyConversations } from '../_lib/actions/getMyConversations';
 import Image from 'next/image';
 import Link from 'next/link';
 
-const formatMessageTime = (dateString) => {
+export const formatMessageTime = (dateString) => {
   if (!dateString) return "";
   const date = new Date(dateString);
   return date.toLocaleString('en-US', {
