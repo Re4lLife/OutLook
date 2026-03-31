@@ -11,9 +11,10 @@ const supabase = createClient();
 
 export default function ChatInterface({ initialData, userId, chatId }) {
     const [chat, setChat] = useState(initialData);
-    console.log(initialData)
     const [text, setText] = useState("");
     const scrollRef = useRef(null);
+    const [isOtherTyping, setIsOtherTyping] = useState(false);
+    const typingTimeoutRef = useRef(null);
 
     useEffect(() => {
         // 1. Create a channel for this specific conversation
@@ -49,6 +50,39 @@ export default function ChatInterface({ initialData, userId, chatId }) {
             supabase.removeChannel(channel);
         };
     }, [chatId, userId]);
+
+    //......................................
+    useEffect(() => {
+        const channel = supabase.channel(`typing:${chatId}`);
+
+        channel
+            .on('presence', { event: 'sync' }, () => {
+                const state = channel.presenceState();
+                // Check if anyone else in the channel has "isTyping: true"
+                const typingUsers = Object.values(state)
+                    .flat()
+                    .filter(p => p.userId !== userId && p.isTyping);
+                setIsOtherTyping(typingUsers.length > 0);
+            })
+            .subscribe(async (status) => {
+                if (status === 'SUBSCRIBED') {
+                    await channel.track({ userId, isTyping: false });
+                }
+            });
+
+        return () => { supabase.removeChannel(channel); };
+    }, [chatId, userId]);
+
+    // Function to trigger when local user types
+    const handleTyping = () => {
+        supabase.channel(`typing:${chatId}`).track({ userId, isTyping: true });
+
+        // Stop showing "typing" after 2 seconds of no keypresses
+        if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+        typingTimeoutRef.current = setTimeout(() => {
+            supabase.channel(`typing:${chatId}`).track({ userId, isTyping: false });
+        }, 2000);
+    };
 
 
     //......................................
@@ -126,8 +160,8 @@ export default function ChatInterface({ initialData, userId, chatId }) {
                     {optimisticMessages.map((m) => (
                         <div key={m.id} className={`flex ${m.isMe ? 'justify-end' : 'justify-start'}`}>
                             <div className={`max-w-[75%] px-4 py-2.5 rounded-2xl relative shadow-sm ${m.isMe
-                                    ? 'bg-purple-600 text-white rounded-br-none'
-                                    : 'bg-zinc-800 text-zinc-200 rounded-bl-none'
+                                ? 'bg-purple-600 text-white rounded-br-none'
+                                : 'bg-zinc-800 text-zinc-200 rounded-bl-none'
                                 }`}>
                                 {/* Message Content */}
                                 <p className="text-[15px] pr-10 pb-2">{m.content}</p>
@@ -139,13 +173,25 @@ export default function ChatInterface({ initialData, userId, chatId }) {
                                         <span className="animate-pulse italic">sending...</span>
                                     ) : (
                                         <span>{formatMessageTime(m.createdAt)}</span>
-                                    )}        
+                                    )}
                                 </div>
                             </div>
                         </div>
                     ))}
+
+                    {/* --- TYPING INDICATOR POSITIONED HERE --- */}
+                    {isOtherTyping && (
+                        <div className="flex justify-start w-full transition-all animate-in fade-in slide-in-from-bottom-2">
+                            <div className="bg-zinc-800 px-4 py-3 rounded-2xl rounded-bl-none flex gap-1.5 items-center shadow-sm">
+                                <span className="typing-dot"></span>
+                                <span className="typing-dot"></span>
+                                <span className="typing-dot"></span>
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
+
 
             {/* INPUT AREA */}
             <div className="w-full border-t border-zinc-800 p-4 bg-[#050505]">
@@ -156,7 +202,10 @@ export default function ChatInterface({ initialData, userId, chatId }) {
                     <input
                         name="message"
                         value={text}
-                        onChange={(e) => setText(e.target.value)}
+                        onChange={(e) => {
+                            setText(e.target.value);
+                            handleTyping(); // Trigger the presence broadcast
+                        }}
                         className="flex-1 bg-zinc-900 text-white p-3.5 rounded-2xl outline-none border border-transparent focus:border-zinc-800 transition-all placeholder:text-zinc-600"
                         placeholder="Write a message..."
                     />
