@@ -1,21 +1,33 @@
 "use client"
-import { createClient } from '../../_lib/supabase/client';
+import { createClient } from '../_lib/supabase/client';
 import { useEffect, useOptimistic, useRef, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { sendMessage } from '../../_lib/actions/sendMessage';
-import { formatMessageTime } from '../ChatList';
+import { sendMessage } from '../_lib/actions/sendMessage';
+import { formatMessageTime } from './ChatList';
 
 const supabase = createClient();
-
 
 export default function ChatInterface({ initialData, userId, chatId }) {
     const [chat, setChat] = useState(initialData);
     const [text, setText] = useState("");
     const scrollRef = useRef(null);
     const [isOtherTyping, setIsOtherTyping] = useState(false);
-    const typingTimeoutRef = useRef(null);
 
+    const typingTimeoutRef = useRef(null);
+    const typingChannelRef = useRef(null);
+    // NEW: We use this to stop spamming the Supabase server on every keystroke
+    const isTypingLocallyRef = useRef(false);
+
+
+
+   // --- 0. INITIAL CHAT DATA ---
+    useEffect(() => {
+        setChat(initialData);
+    }, [initialData]);
+
+
+    // --- 1. MESSAGE REALTIME ---
     useEffect(() => {
         // 1. Create a channel for this specific conversation
         const channel = supabase
@@ -26,11 +38,10 @@ export default function ChatInterface({ initialData, userId, chatId }) {
                     event: 'INSERT',
                     schema: 'public',
                     table: 'message',
-                    filter: `conversationId=eq.${chatId}`, // Only listen to THIS chat
+                    filter: `conversationId=eq.${chatId}`,
                 },
                 (payload) => {
                     const newMessage = payload.new;
-
                     if (newMessage.userId !== userId) {
                         setChat((prev) => ({
                             ...prev,
@@ -45,24 +56,28 @@ export default function ChatInterface({ initialData, userId, chatId }) {
                 }
             )
             .subscribe();
-        // 3. CLEANUP: Leave the room when the user switches chats
         return () => {
             supabase.removeChannel(channel);
         };
     }, [chatId, userId]);
 
-    //......................................
+
+    // --- 2. TYPING REALTIME (THE FIX) ---
     useEffect(() => {
-        const channel = supabase.channel(`typing:${chatId}`);
+        // Create the channel ONCE when the component loads
+        const channel = supabase.channel(`typing-${chatId}`);
+        typingChannelRef.current = channel;
 
         channel
             .on('presence', { event: 'sync' }, () => {
                 const state = channel.presenceState();
-                // Check if anyone else in the channel has "isTyping: true"
-                const typingUsers = Object.values(state)
+
+                // We use String() to ensure "123" matches 123
+                const currentlyTyping = Object.values(state)
                     .flat()
-                    .filter(p => p.userId !== userId && p.isTyping);
-                setIsOtherTyping(typingUsers.length > 0);
+                    .some(p => String(p.userId) !== String(userId) && p.isTyping);
+
+                setIsOtherTyping(currentlyTyping);
             })
             .subscribe(async (status) => {
                 if (status === 'SUBSCRIBED') {
@@ -70,48 +85,54 @@ export default function ChatInterface({ initialData, userId, chatId }) {
                 }
             });
 
-        return () => { supabase.removeChannel(channel); };
+        return () => {
+            supabase.removeChannel(channel);
+            typingChannelRef.current = null;
+        };
     }, [chatId, userId]);
 
-    // Function to trigger when local user types
+    // --- 3. TYPING HANDLER ---
     const handleTyping = () => {
-        supabase.channel(`typing:${chatId}`).track({ userId, isTyping: true });
+        const channel = typingChannelRef.current;
+        if (!channel) return;
 
-        // Stop showing "typing" after 2 seconds of no keypresses
+        // Start typing
+        if (!isTypingLocallyRef.current) {
+            isTypingLocallyRef.current = true;
+            channel.track({ userId, isTyping: true });
+        }
+
+        // Stop typing timer
         if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
         typingTimeoutRef.current = setTimeout(() => {
-            supabase.channel(`typing:${chatId}`).track({ userId, isTyping: false });
+            isTypingLocallyRef.current = false;
+            if (typingChannelRef.current) {
+                typingChannelRef.current.track({ userId, isTyping: false });
+            }
         }, 2000);
     };
 
 
-    //......................................
+    // --- 4. MESSAGE ACTIONS ---
     const [optimisticMessages, addOptimisticMessage] = useOptimistic(
         chat.messages,
         (state, newMessage) => [...state, newMessage]
     );
 
-    //......................................
-    useEffect(() => {
-        if (scrollRef.current) {
-            scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-        }
-    }, [optimisticMessages]);
-
-
-    //........................................
-    useEffect(() => {
-        setChat(initialData);
-    }, [initialData]);
-
-
-    //........................................
+    
     async function handleAction(formData) {
         const content = formData.get("message");
         if (!content || !content.trim()) return;
 
+        // Instantly stop typing indicator when message is sent
+        if (typingChannelRef.current) {
+            isTypingLocallyRef.current = false;
+            typingChannelRef.current.track({ isTyping: false });
+            if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+        }
+
         const placeholderMsg = {
-            id: Math.random().toString(), // temporary ID
+            id: Math.random().toString(),
             content: content,
             createdAt: new Date().toISOString(),
             senderName: "Me",
@@ -124,16 +145,20 @@ export default function ChatInterface({ initialData, userId, chatId }) {
         const res = await sendMessage(chatId, userId, content);
         if (res.error) {
             console.error(res.error);
-            // Maybe revert the text so the user can try again
             setText(content);
         }
     }
 
+
+    // --- 5. SCROLL EFFECT ---
+    useEffect(() => {
+        if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }, [optimisticMessages, isOtherTyping]);
+
     return (
-        <div className="flex flex-col h-full bg-[#050505] w-full items-center">
-            <header className="w-full border-b border-zinc-800 bg-[#050505]/90 backdrop-blur-md sticky top-0 z-10 flex justify-center">
+        <div className="flex flex-col h-screen bg-[#050505] w-full items-center">
+            <header className="fixed top-0 left-0 right-0 z-50 pt-[calc(1rem+env(safe-area-inset-top))] md:static md:border-bottom-0 w-full bg-[#050505]/90 backdrop-blur-md flex justify-center">
                 <div className="w-full max-w-4xl p-3 flex items-center justify-between">
-                    {/* Header Content (Same as before, using chat.details) */}
                     <div className="flex items-center gap-4">
                         <Link href="/chat" className="md:hidden text-zinc-400">←</Link>
                         <div className="flex items-center gap-3">
@@ -155,7 +180,7 @@ export default function ChatInterface({ initialData, userId, chatId }) {
                 </div>
             </header>
 
-            <div ref={scrollRef} className="flex-1 w-full overflow-y-auto scroll-smooth custom-chat-scrollbar">
+            <div ref={scrollRef} className="flex-1 w-full py-[10vh] overflow-y-auto scroll-smooth custom-chat-scrollbar">
                 <div className="max-w-4xl mx-auto p-4 md:p-6 space-y-4">
                     {optimisticMessages.map((m) => (
                         <div key={m.id} className={`flex ${m.isMe ? 'justify-end' : 'justify-start'}`}>
@@ -163,10 +188,8 @@ export default function ChatInterface({ initialData, userId, chatId }) {
                                 ? 'bg-purple-600 text-white rounded-br-none'
                                 : 'bg-zinc-800 text-zinc-200 rounded-bl-none'
                                 }`}>
-                                {/* Message Content */}
                                 <p className="text-[15px] pr-10 pb-2">{m.content}</p>
 
-                                {/* Meta Information (Time / Sending Status) */}
                                 <div className={`text-[10px] absolute bottom-1.5 right-3 flex items-center gap-1 ${m.isMe ? 'text-purple-200' : 'text-zinc-400'
                                     }`}>
                                     {m.sending ? (
@@ -192,9 +215,8 @@ export default function ChatInterface({ initialData, userId, chatId }) {
                 </div>
             </div>
 
-
             {/* INPUT AREA */}
-            <div className="w-full border-t border-zinc-800 p-4 bg-[#050505]">
+            <div className="fixed bottom-0 left-0 right-0 z-50 bg-[#050505] border-t border-zinc-900 p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] md:static md:border-t-0">
                 <form
                     action={handleAction}
                     onSubmit={() => setText("")}
@@ -204,7 +226,7 @@ export default function ChatInterface({ initialData, userId, chatId }) {
                         value={text}
                         onChange={(e) => {
                             setText(e.target.value);
-                            handleTyping(); // Trigger the presence broadcast
+                            handleTyping();
                         }}
                         className="flex-1 bg-zinc-900 text-white p-3.5 rounded-2xl outline-none border border-transparent focus:border-zinc-800 transition-all placeholder:text-zinc-600"
                         placeholder="Write a message..."

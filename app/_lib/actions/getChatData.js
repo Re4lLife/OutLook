@@ -1,3 +1,4 @@
+// getChatData.js
 "use server";
 import prisma from "../prisma";
 
@@ -8,7 +9,8 @@ export async function getChatData(conversationId, currentUserId) {
       include: {
         members: {
           include: {
-            user: { select: { id: true, name: true, photo: true } }
+            // Include username here
+            user: { select: { id: true, name: true, photo: true, username: true } }
           }
         },
         messages: {
@@ -22,17 +24,22 @@ export async function getChatData(conversationId, currentUserId) {
 
     if (!chat) return { success: false, error: "Chat not found" };
 
-    // 1. Determine Chat Identity (Metadata)
     let chatName = chat.name;
     let chatPhoto = null;
 
     if (!chat.isGroup) {
       const otherMember = chat.members.find(m => m.userId !== currentUserId);
-      chatName = otherMember?.user.name || "User";
-      chatPhoto = otherMember?.user.photo;
+      const otherUser = otherMember?.user;
+      
+      // Fallback logic
+      if (otherUser) {
+        chatName = otherUser.name === "user" ? otherUser.username : otherUser.name;
+        chatPhoto = otherUser.photo;
+      } else {
+        chatName = "Unknown";
+      }
     }
 
-    // 2. Sanitize Messages
     const sanitizedMessages = chat.messages.map(m => ({
       id: m.id,
       content: m.content,

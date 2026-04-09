@@ -3,6 +3,7 @@ import "./globals.css";
 import Header from "./_components/Header";
 import NextTopLoader from 'nextjs-toploader';
 import { AuthProvider } from "./context/AuthContext";
+import { ChatProvider } from "./context/ChatContext";
 
 
 const geistSans = Geist({
@@ -40,10 +41,12 @@ export default function RootLayout({ children }) {
           shadow="0 0 10px #ffffff,0 0 5px #ffffff"
         />
         <AuthProvider>
-          <Header />
-          {children}
+          <ChatProvider>
+            <Header />
+            {children}
+          </ChatProvider>
         </AuthProvider>
       </body>
-    </html>
+    </html >
   );
 }

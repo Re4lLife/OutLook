@@ -1,7 +1,7 @@
 import { getChatData } from "../../_lib/actions/getChatData";
 import { cookies } from "next/headers";
-import ChatInterface from "./ChatInterface";
 import { jwtVerify } from "jose";
+import ChatInterface from "../../_components/ChatInterface";
 
 
 

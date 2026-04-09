@@ -99,6 +99,7 @@ export default function SignInPage() {
                         <label className="block text-gray-300 text-xs uppercase tracking-widest mb-2 ml-1">Email Address</label>
                         <input
                             name='email'
+                            disabled={pending}
                             type="email"
                             placeholder="name@hotmail.com"
                             className="w-full bg-[#0d012e]/80 border border-white/10 rounded-lg px-4 py-3 text-white placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all" />
@@ -112,6 +113,7 @@ export default function SignInPage() {
                         <div className="relative">
                             <input
                                 name='password'
+                                disabled={pending}
                                 type={showPassword ? "text" : "password"}
                                 placeholder="••••••••"
                                 className="w-full bg-[#0d012e]/80 border border-white/10 rounded-lg px-4 py-3 text-white placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all"
