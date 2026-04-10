@@ -4,7 +4,7 @@ import nodemailer from "nodemailer";
 export const sendVerificationEmail = async (email, token) => {
   // 1. Store token in Redis (Expires in 1 hour)
   // We map the token (key) to the email (value)
-  await redis.set(token, email, { ex: 3600 });
+  await redis.set(token, email, { ex: 3000 });
 
   // 2. Setup Nodemailer
   const transporter = nodemailer.createTransport({
@@ -35,7 +35,7 @@ export const sendVerificationEmail = async (email, token) => {
       
         <p style="color: #8b949e; font-size: 16px; line-height: 1.6; margin-bottom: 32px;">
           Thanks for signing up! Please verify your email address to unlock your account. 
-          This link will expire in 1 hour.
+          <span style="margin-top: 10px;">This link will expire in 1 hour.</span>
         </p>
 
         <div style="margin-bottom: 32px;">

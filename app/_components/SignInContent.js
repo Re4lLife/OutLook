@@ -37,7 +37,7 @@ export default function SignInContent() {
                 setResendMessage(result.success);
                 setIsSuccess(true);
             } else {
-                setResendMessage(result?.error || "Error resending email.");
+                setResendMessage(result?.error || "Error resending email❗");
                 setIsSuccess(false);
             }
         });
