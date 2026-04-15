@@ -30,7 +30,7 @@ function ChatLayout({ children }) {
   return (
     <div className="flex h-[100dvh] w-full overflow-hidden bg-black">
       <aside className={
-        isInsideChat
+        isInsideChat || draftUser
           ? "hidden md:flex md:w-[420px] lg:w-[510px] shrink-0 border-r border-zinc-800 h-full md:flex-row relative overflow-hidden"
           : "flex md:w-[420px] lg:w-[510px] w-full shrink-0 border-r border-zinc-800 h-full md:flex-row flex-col relative overflow-hidden"
       }>

@@ -35,7 +35,7 @@ export const sendVerificationEmail = async (email, token) => {
       
         <p style="color: #8b949e; font-size: 16px; line-height: 1.6; margin-bottom: 32px;">
           Thanks for signing up! Please verify your email address to unlock your account. 
-          <span style="margin-top: 10px;">This link will expire in 1 hour.</span>
+          <span style="margin-top: 10px;">This link will expire in less than an 1 hour.</span>
         </p>
 
         <div style="margin-bottom: 32px;">

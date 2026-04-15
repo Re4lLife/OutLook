@@ -52,7 +52,7 @@ export default function DraftChatInterface({ draftUser, onComplete, onCancel }) 
     }
 
     return (
-        <div className="flex flex-col h-full bg-[#050505] w-full items-center">
+        <div className="flex flex-col h-full bg-[#050505] w-full items-center z-60">
             <header className="fixed top-0 left-0 right-0 z-50 pt-[calc(1rem+env(safe-area-inset-top))] md:static md:border-bottom-0 w-full bg-[#050505]/90 backdrop-blur-md flex justify-center">
                 <div className="w-full max-w-4xl p-3 flex items-center justify-between">
                     <div className="flex items-center gap-4">
@@ -76,7 +76,7 @@ export default function DraftChatInterface({ draftUser, onComplete, onCancel }) 
                 </div>
             </header>
 
-            <div ref={scrollRef} className="flex-1 w-full overflow-y-auto scroll-smooth custom-chat-scrollbar">
+            <div ref={scrollRef} className="flex-1 w-full overflow-y-auto scroll-smooth custom-chat-scrollbar pt-24 md:pt-0">
                 <div className="max-w-4xl mx-auto p-4 md:p-6 space-y-4">
                     {optimisticMessages.length === 0 && (
                         <p className="text-center text-zinc-600 text-sm mt-10 italic">
@@ -103,7 +103,7 @@ export default function DraftChatInterface({ draftUser, onComplete, onCancel }) 
                 </div>
             </div>
 
-            <div className="fixed bottom-0 left-0 right-0 z-50 bg-[#050505] border-t border-zinc-900 p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] md:static md:border-t-0">
+            <div className="fixed bottom-0 left-0 right-0 z-50 bg-[#050505] border-t border-zinc-900 p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] md:static md:border-t-0 w-full">
                 <form
                     action={handleAction}
                     onSubmit={() => setText("")}

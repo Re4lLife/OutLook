@@ -216,7 +216,7 @@ export default function ChatInterface({ initialData, userId, chatId }) {
             </div>
 
             {/* INPUT AREA */}
-            <div className="fixed bottom-0 left-0 right-0 z-50 bg-[#050505] border-t border-zinc-900 p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] md:static md:border-t-0">
+            <div className="fixed bottom-0 left-0 right-0 z-50 bg-[#050505] border-t border-zinc-900 p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] md:static md:border-t-0 w-full">
                 <form
                     action={handleAction}
                     onSubmit={() => setText("")}
