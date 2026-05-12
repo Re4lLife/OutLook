@@ -3,7 +3,7 @@ import { useState, useOptimistic, useRef, useEffect } from "react";
 import Image from "next/image";
 import { useAuth } from "../context/AuthContext";
 import { startNewConversation } from "../_lib/actions/startNewConversation";
-import { formatMessageTime } from "./ChatList";
+import { formatMessageTime } from "../_lib/util/util";
 
 export default function DraftChatInterface({ draftUser, onComplete, onCancel }) {
     const { user } = useAuth();

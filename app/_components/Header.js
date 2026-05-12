@@ -6,8 +6,9 @@ import { usePathname } from "next/navigation";
 export default function Header() {
     const pathname = usePathname();
     const isChatPage = pathname.startsWith('/chat');
+    const isProfilePage = pathname.startsWith('/profile');
 
-    if (isChatPage) return null;
+    if (isChatPage || isProfilePage) return null;
 
     return (
         <header className="pt-2">

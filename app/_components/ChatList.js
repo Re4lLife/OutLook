@@ -6,16 +6,7 @@ import { useChatData } from '../context/ChatContext';
 import Image from 'next/image';
 import Link from 'next/link';
 import LoadingChats from './LoadingChats';
-
-export const formatMessageTime = (dateString) => {
-  if (!dateString) return "";
-  const date = new Date(dateString);
-  return date.toLocaleString('en-US', {
-    hour: 'numeric',
-    minute: '2-digit',
-    hour12: true
-  });
-};
+import { formatMessageTime } from '../_lib/util/util';
 
 
 function ChatList({ searchTerm }) {

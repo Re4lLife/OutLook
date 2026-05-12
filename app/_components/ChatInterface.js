@@ -4,7 +4,7 @@ import { useEffect, useOptimistic, useRef, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { sendMessage } from '../_lib/actions/sendMessage';
-import { formatMessageTime } from './ChatList';
+import { formatMessageTime } from "../_lib/util/util";
 
 const supabase = createClient();
 
@@ -173,7 +173,6 @@ export default function ChatInterface({ initialData, userId, chatId }) {
                             </div>
                             <div>
                                 <h2 className="text-white font-bold text-base">{chat.details?.name}</h2>
-                                <p className="text-[11px] text-green-500">online</p>
                             </div>
                         </div>
                     </div>
