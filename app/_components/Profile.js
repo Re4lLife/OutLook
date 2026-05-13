@@ -60,8 +60,8 @@ export default function Profile({ initialProfile, userId }) {
 
             {/* LEFT PANEL — desktop only */}
             <div className="hidden md:flex md:w-1/2 lg:w-[55%] items-center justify-center relative overflow-hidden bg-[#050505] border-r border-zinc-900">
-                <Link href="/chat" className="xl:flex hidden text-sm text-purple-500 absolute right-160 top-10" type="button">
-                    &lt;- Back
+                <Link href="/chat" className="md:flex text-sm text-white absolute md:left-[5vw] top-[10vh] border-1 border-gray-50/30 rounded-xl py-1.5 px-3.5" type="button">
+                    Back
                 </Link>
                 {/* Animated background glow */}
                 <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
@@ -102,15 +102,15 @@ export default function Profile({ initialProfile, userId }) {
             {/* RIGHT PANEL — profile info */}
             <div className="flex-1 flex flex-col items-center justify-start pt-12 pb-10 px-6 overflow-y-auto">
                 {/* Animated background glow */}
-                <div className="items-center bottom-80 absolute inset-0 flex items-center justify-center pointer-events-none">
-                    <div className="w-[500px] h-[300px] bg-purple-700/10 rounded-full blur-3xl animate-none" />
+                <div className="items-center bottom-80 right-20 absolute inset-0 flex items-center justify-center pointer-events-none">
+                    <div className="w-[500px] h-[300px] bg-purple-700/10 rounded-full blur-3xl" />
                     <div className="absolute w-[100px] h-[300px] bg-purple-500/5 rounded-full blur-2xl animate-ping" style={{ animationDuration: '4s' }} />
                 </div>
 
                 {/* Avatar */}
                 <div className="relative group cursor-pointer mb-6" onClick={() => fileInputRef.current?.click()}>
-                    <Link href="/chat" className="xl:hidden text-sm text-purple-500 absolute right-60" type="button">
-                        &lt;- Back
+                    <Link href="/chat" className="md:hidden text-sm text-white absolute left-[-30vw] border-1 border-gray-50/30 rounded-xl py-1.5 px-3.5" type="button">
+                        Back
                     </Link>
                     <div className="w-28 h-28 md:w-32 md:h-32 relative overflow-hidden rounded-full border-2 border-zinc-800 bg-zinc-900 flex items-center justify-center">
                         {profile.photo ? (

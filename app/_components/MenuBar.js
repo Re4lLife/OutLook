@@ -18,7 +18,7 @@ export default function MenuBar({ onToggleSearch, isSearchOpen }) {
                 <FaCirclePlus className={`text-purple-300 md:text-4xl text-5xl transition-transform duration-300 ${isSearchOpen ? 'rotate-45 text-red-500' : ''}`}/>
             </button>
 
-            <Link href="/profile" className="text-zinc-400 md:border-t pt-5 hover:text-white transition">
+            <Link href="/profile" className="text-zinc-400 pb-2 md:border-t pt-5 hover:text-white transition">
                 <CgProfile size={26} />
             </Link>
         </div>
