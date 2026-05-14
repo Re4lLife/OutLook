@@ -3,7 +3,7 @@ import { useState } from "react";
 import ChatList from "./ChatList";
 import DotMenu from "./DotMenu";
 
-export default function Chat() {
+export default function Chat({ setDraftUser }) {
     const [searchTerm, setSearchTerm] = useState("");
 
     return (
@@ -24,7 +24,7 @@ export default function Chat() {
 
             <div className="flex-1 overflow-hidden">
                 <div className="p-5 font-bold text-xl text-white">Chats</div>
-                <ChatList searchTerm={searchTerm} />
+                <ChatList searchTerm={searchTerm} setDraftUser={setDraftUser} />
             </div>
         </div>
     )

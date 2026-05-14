@@ -9,7 +9,7 @@ import LoadingChats from './LoadingChats';
 import { formatMessageTime } from '../_lib/util/util';
 
 
-function ChatList({ searchTerm }) {
+function ChatList({ searchTerm, setDraftUser }) {
   const { user } = useAuth();
   const { chats, isLoading, setCurrentOpenChatId } = useChatData();
   const params = useParams();
@@ -49,10 +49,10 @@ function ChatList({ searchTerm }) {
           return (
             <Link
               href={`/chat/${chat.id}`}
+              onClick={() => setDraftUser(null)}
               key={chat.id}
               className={`flex w-full items-center gap-3 p-4 hover:bg-zinc-900 transition border-b border-zinc-900 group ${currentOpenChatId === chat.id ? 'bg-zinc-900' : ''
-                }`}
-            >
+                }`}>
               {/* Image and Content mapping here - Same as your original code */}
               <div className="relative w-12 h-12 shrink-0">
                 <Image src={otherUser.photo} alt="" fill unoptimized className="rounded-full object-cover" />
@@ -86,7 +86,7 @@ function ChatList({ searchTerm }) {
         {searchTerm.length === 0 && chats.length === 0 &&
           <p
             className='text-sm italic text-gray-400 flex items-center tracking-wide justify-center mt-[15vh]'>
-            Click on the <span className='text-xl text-purple-600 font-bold mx-1'>+</span> icon and add a friend. 
+            Click on the <span className='text-xl text-purple-600 font-bold mx-1'>+</span> icon and add a friend.
           </p>
         }
       </div>

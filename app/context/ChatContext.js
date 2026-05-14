@@ -23,10 +23,10 @@ export function ChatProvider({ children }) {
 
     // Initial load
     useEffect(() => {
-        if (user && token && chats.length === 0) {
+        if (user && token) {
             fetchChats();
         }
-    }, [user, token, fetchChats, chats.length]);
+    }, [user, token, fetchChats]);
 
     // Listener 1: New messages in existing chats
     useEffect(() => {

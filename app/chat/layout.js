@@ -13,6 +13,8 @@ function ChatLayout({ children }) {
   const [draftUser, setDraftUser] = useState(null);
   const isInsideChat = pathname.startsWith('/chat/') && pathname.length > '/chat/'.length;
 
+  console.log(draftUser);
+
 
   const handleSelectUser = (user) => {
     setIsSearchOpen(false);
@@ -41,7 +43,7 @@ function ChatLayout({ children }) {
         </div>
 
         <div className="flex-1 flex flex-col h-full relative min-w-0 pb-[72px] md:pb-0 overflow-hidden">
-          <Chat />
+          <Chat setDraftUser={setDraftUser} />
           <SearchOverlay isOpen={isSearchOpen} onSelectUser={handleSelectUser} />
         </div>
       </aside>
