@@ -13,8 +13,7 @@ _Outlook is a social media platform. Chat with friends. Add and make new friends
 - Real-time messaging
 - User presence tracking
 - Custom profile management
-- JWT authentication
-
+- User authentication & authorization
 
 ## Demo
 https://github.com/user-attachments/assets/6dffb950-ab09-494f-ba12-7c8b77aceae4
