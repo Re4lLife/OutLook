@@ -1,36 +1,23 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Outlook
+_Outlook is a social media platform. Chat with friends. Add and make new friends._
 
-## Getting Started
+[![outlook.png](https://i.postimg.cc/rwbz5hMG/outlook.png)](https://postimg.cc/RW7MBL3q)
 
-First, run the development server:
+## Tech Stack
+- **Framework:** Next.js
+- **Styling:** Tailwind CSS
+- **Database & ORM:** PostgreSQL, Prisma
+- **Infrastructure:** Supabase (Realtime, Presence, Storage)
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Features
+- Real-time messaging
+- User presence tracking
+- Custom profile management
+- JWT authentication
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+## Demo
+https://github.com/user-attachments/assets/6dffb950-ab09-494f-ba12-7c8b77aceae4
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Live 🌐
+[Outlook](https://out-look-6bp7.vercel.app/)
