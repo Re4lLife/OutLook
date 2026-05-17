@@ -16,19 +16,18 @@ export default function DraftChatInterface({ draftUser, onComplete, onCancel }) 
         (state, newMsg) => [...state, newMsg]
     );
 
+
+
     useEffect(() => {
         if (scrollRef.current) {
             scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
         }
     }, [optimisticMessages]);
 
+
+
     async function handleAction(formData) {
         const content = formData.get("message");
-
-        console.log("1. content:", content);
-        console.log("2. user:", user);
-        console.log("3. draftUser:", draftUser);
-
         if (!content || !content.trim()) return;
 
         const placeholder = {
@@ -38,9 +37,8 @@ export default function DraftChatInterface({ draftUser, onComplete, onCancel }) 
             isMe: true,
             sending: true,
         };
-
+        
         addOptimisticMessage(placeholder);
-
         const res = await startNewConversation(user.userId, draftUser.id, content);
 
         if (res.success) {
