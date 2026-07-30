@@ -19,4 +19,4 @@ _Outlook is a social media platform. Chat with friends. Add and make new friends
 https://github.com/user-attachments/assets/6dffb950-ab09-494f-ba12-7c8b77aceae4
 
 ## Live 🌐
-[Outlook](https://out-look-6bp7.vercel.app/)
+[Outlook](https://out-look-6bp7.vercel.app/) (offline for now)
